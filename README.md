@@ -20,8 +20,8 @@ This project uses the following technologies:
 
 - **PHP Version**: 8.2.0 
 - **Node.js Version**: 22.9.0
-- **Framework**: Laravel 8.x
-- **Frontend**: Bootstrap 5.x
+- **Framework**: Laravel 11.38.2
+- **Frontend**: Bootstrap 5.2.3
 
 ## Installation Instructions
 
@@ -40,6 +40,14 @@ Follow these steps to set up the project locally:
     ```bash
     npm install
 
-4. **Run the application using Laravel's development server:**
+4. **Set up your environment variables by copying .env.example to .env:**
+    ```bash
+    cp .env.example .env
+
+5. **Generate an application key**
+    ```bash
+    php artisan key:generate
+
+6. **Run the application using Laravel's development server:**
     ```bash
     php artisan serve
