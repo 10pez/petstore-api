@@ -2,42 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePetRequest;
+use App\Http\Requests\UpdatePetRequest;
 use App\Services\PetstoreService;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class PetController extends Controller
 {
-    protected $petstoreService;
+    public function __construct(protected PetstoreService $petstoreService) {}
 
-    public function __construct(PetstoreService $petstoreService) {
-        $this->petstoreService = $petstoreService;
-    }
-
-    public function index() {
+    public function index(): View
+    {
         $pets = $this->petstoreService->getAllPets();
+
         return view('pets.index', compact('pets'));
     }
 
-    public function show($id)
+    public function show(int $id): View
     {
         $pet = $this->petstoreService->getPetById($id);
+
         return view('pets.show', compact('pet'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('pets.create');
     }
 
-    public function store(Request $request)
+    public function store(StorePetRequest $request): RedirectResponse
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'status' => 'required|in:available,pending,sold',
-            'category' => 'nullable|string|max:255',
-            'tags' => 'nullable|string',
-            'photoUrls' => 'nullable|string',
-        ]);
+        $validatedData = $request->validated();
+
+        $photoUrls = is_string($validatedData['photoUrls']) ? explode(',', $validatedData['photoUrls']) : [];
 
         $data = [
             'id' => 0,
@@ -46,51 +44,45 @@ class PetController extends Controller
                 'name' => $validatedData['category'] ?? 'default',
             ],
             'name' => $validatedData['name'],
-            'photoUrls' => array_map('trim', explode(',', $validatedData['photoUrls'] ?? '')),
-            'tags' => array_map(fn($tag) => ['id' => 0, 'name' => trim($tag)], explode(',', $validatedData['tags'] ?? '')),
+            'photoUrls' => array_map('trim', $photoUrls),
+            'tags' => array_map(fn ($tag) => ['id' => 0, 'name' => trim($tag)], explode(',', $validatedData['tags'] ?? '')), // Przekształcamy tagi w tablicę
             'status' => $validatedData['status'],
         ];
 
         $response = $this->petstoreService->createPet($data);
 
-        return redirect()->route('pets.index')->with('success', 'Zwierzę zostało dodane!');
+        return redirect()->route('pets.index')->with('success', __('messages.pet_added'));
     }
 
-    public function edit($id)
+    public function edit(int $id): View
     {
         $pet = $this->petstoreService->getPetById($id);
+
         return view('pets.edit', compact('pet'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdatePetRequest $request, int $id): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'status' => 'required|in:available,pending,sold',
-            'category' => 'nullable|string|max:255',
-            'tags' => 'nullable|string',
-            'photoUrls' => 'nullable|string',
-        ]);
-
+        $validatedData = $request->validated();
 
         $data = [
             'id' => $id,
-            'name' => $request->name,
-            'status' => $request->status,
-            'category' => ['name' => $request->category],
-            'tags' => array_map(fn($tag) => ['name' => trim($tag)], explode(',', $request->tags)),
-            'photoUrls' => array_map('trim', explode(',', $request->photoUrls)),
+            'name' => $validatedData['name'],
+            'status' => $validatedData['status'],
+            'category' => ['name' => $validatedData['category']],
+            'tags' => array_map(fn ($tag) => ['name' => trim($tag)], explode(',', $validatedData['tags'] ?? '')),
+            'photoUrls' => array_map('trim', explode(',', $validatedData['photoUrls'] ?? '')),
         ];
 
+        $this->petstoreService->updatePet($data);
 
-        $this->petstoreService->updatePet( $data);
-
-        return redirect()->route('pets.index')->with('success', 'Zwierzę zostało zaktualizowane!');
+        return redirect()->route('pets.index')->with('success', __('messages.pet_updated'));
     }
 
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
         $this->petstoreService->deletePet($id);
+
         return redirect()->route('pets.index');
     }
 }

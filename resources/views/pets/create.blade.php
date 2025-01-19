@@ -18,39 +18,37 @@
 
         <form action="{{ route('pets.store') }}" method="POST">
             @csrf
-
-            <div class="mb-3">
-                <label for="name" class="form-label">Nazwa Zwierzęcia</label>
-                <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}" required>
+            <div class="form-group">
+                <label for="name">Nazwa:</label>
+                <input type="text" id="name" name="name" class="form-control" required>
             </div>
 
-            <div class="mb-3">
-                <label for="status" class="form-label">Status</label>
-                <select name="status" id="status" class="form-select" required>
-                    <option value="" disabled selected>Wybierz status</option>
-                    <option value="available" {{ old('status') == 'available' ? 'selected' : '' }}>Dostępne</option>
-                    <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Oczekujące</option>
-                    <option value="sold" {{ old('status') == 'sold' ? 'selected' : '' }}>Sprzedane</option>
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select name="status" id="status" class="form-control" required>
+                    <option value="available">Dostępne</option>
+                    <option value="pending">Oczekujące</option>
+                    <option value="sold">Sprzedane</option>
                 </select>
             </div>
 
-            <div class="mb-3">
-                <label for="category" class="form-label">Kategoria</label>
-                <input type="text" name="category" id="category" class="form-control" value="{{ old('category') }}">
+            <div class="form-group">
+                <label for="category">Kategoria:</label>
+                <input type="text" id="category" name="category" class="form-control">
             </div>
 
-            <div class="mb-3">
-                <label for="tags" class="form-label">Tagi (oddzielone przecinkami)</label>
-                <input type="text" name="tags" id="tags" class="form-control" value="{{ old('tags') }}">
+            <div class="form-group">
+                <label for="photoUrls">Adresy URL zdjęć (oddzielone przecinkami):</label>
+                <input type="text" name="photoUrls" id="photoUrls" class="form-control">
             </div>
 
-            <div class="mb-3">
-                <label for="photoUrls" class="form-label">URL Zdjęcia (oddzielone przecinkami)</label>
-                <input type="text" name="photoUrls" id="photoUrls" class="form-control" value="{{ old('photoUrls') }}">
+            <div class="form-group">
+                <label for="tags">Tagi (oddzielone przecinkami):</label>
+                <input type="text" name="tags" id="tags" class="form-control">
             </div>
 
-            <button type="submit" class="btn btn-success">Zapisz</button>
-            <a href="{{ route('pets.index') }}" class="btn btn-secondary">Anuluj</a>
+            <button type="submit" class="btn btn-primary">Dodaj zwierzę</button>
         </form>
+
     </div>
 @endsection
